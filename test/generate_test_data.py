@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from pathlib import Path 
+import datetime 
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -16,10 +17,11 @@ def generate_test_data()->str:
     num_columns = len(columns)
 
     data = np.random.rand(num_rows, num_columns)
-    df = pd.DataFrame(data, columns=columns)
+    df = pd.DataFrame(data, columns=columns, dtype=np.float64)
     df['Column2'] = "this is a string"
     df['Column1'] = 2
     df['Column1'] = df['Column1'].astype(np.int8)
+    df['Column3'] = datetime.datetime.utcnow()
 
     DATA_DIR.mkdir(parents=True,exist_ok=True)
     data_path = DATA_DIR / "data.parquet"

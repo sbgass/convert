@@ -6,7 +6,6 @@ setup(
     description="TODO",
     install_requires=[
         'typer',
-        'pytest',
         'pandas', 
         'pyarrow'
     ],

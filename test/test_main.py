@@ -7,7 +7,7 @@ import shutil
 
 import generate_test_data
 
-from convert.main import convert_all_parquet_files, create_csv_copy
+from convert.main import convert_all_parquet_files, split_data_from_metadata
 
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -28,7 +28,7 @@ def create_temp_dir(request):
 
 @pytest.mark.usefixtures("create_temp_dir")
 class TestIteration:
-    @patch("convert.main.create_csv_copy")
+    @patch("convert.main.split_data_from_metadata")
     def test_convert_all_parquet_files(self, mock_convert):
         convert_all_parquet_files(self.tmpdir)
         assert mock_convert.call_count == 3
@@ -50,13 +50,12 @@ def stage_test_data(request):
 
 @pytest.mark.usefixtures("stage_test_data")
 class TestCsvCopy:
-    def test_create_csv_copy(self): 
-        create_csv_copy(self.data_path) 
+    def test_split_data_from_metadata(self): 
+        split_data_from_metadata(self.data_path) 
 
         # Assert 
         resulting_files = list(self.data_path.parent.iterdir())
-        assert len(resulting_files) == 2, "CSV copy was not created correctly"
+        assert len(resulting_files) == 3, "CSV copy and Metadata generation were not done correctly"
         assert self.data_path in resulting_files, "Expected parquet file to be in output directory"
-        resulting_files.pop(resulting_files.index(self.data_path))
-        assert resulting_files[0] == self.data_path.with_suffix(".csv")
-        
+        assert sum([str(filename).endswith(".json") for filename in resulting_files]) == 1, "One json metadata should be generated for this parquet"
+        assert sum([str(filename).endswith(".csv") for filename in resulting_files]) == 1, "One CSV of the dataframe should be generated for this parquet"
