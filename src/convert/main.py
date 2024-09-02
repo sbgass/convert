@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Type 
 
+from pyarrow import csv 
 import pyarrow.parquet as pq
-import pandas as pd
 import typer 
 import json 
 
@@ -15,8 +15,7 @@ def split_data_from_metadata(filename:Type[Path])->None:
     with open(filename.with_stem(filename.stem + "_metadata").with_suffix(".json"), "w") as f:
         json.dump(metadata_summary, f, indent=4, sort_keys=True,  default=str) 
 
-    df = pd.read_parquet(filename)
-    df.to_csv(filename.with_suffix(".csv"), index=False)
+    csv.write_csv(parquet_file.read(), filename.with_suffix(".csv"))
 
 
 def convert_all_parquet_files(directory_path:Type[Path])-> None:
